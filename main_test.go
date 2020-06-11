@@ -130,3 +130,23 @@ func Test_getValue(t *testing.T) {
 		})
 	}
 }
+
+func Test_toString(t *testing.T) {
+	type args struct {
+		i interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"generic toString implemetnation", args{"to some"}, "to some"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := toString(tt.args.i); got != tt.want {
+				t.Errorf("toString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

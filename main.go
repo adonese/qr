@@ -150,6 +150,7 @@ func (m *Merchant) Decode(s string) {
 
 }
 
+//Encode a QR struct into a text. EBS compatible
 func (m *Merchant) Encode() string {
 	var s string
 
@@ -162,9 +163,11 @@ func (m *Merchant) Encode() string {
 		field := fields.Field(i)
 		value := values.Field(i)
 		fmt.Print("Type:", field.Type, ",", field.Name, "=", value, "\n")
-		// k := MerchantToCode[field.Name]
-		// v := fmt.Sprintf("%02d")
-
+		k := MerchantToCode[field.Name]
+		v := getValue(value)
+		s += k
+		s += v
+		s += toString(value)
 	}
 	return s
 
@@ -189,6 +192,8 @@ func toString(i interface{}) string {
 	case float64:
 		log.Print(strconv.FormatFloat(i, 'f', -1, 32))
 		return strconv.FormatFloat(i, 'f', -1, 32)
+	case string:
+		return i
 	}
 	return ""
 
