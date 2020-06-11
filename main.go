@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"reflect"
 	"strconv"
 )
 
@@ -13,6 +15,27 @@ func main() {
 type QR struct {
 	ID    string
 	Value string
+}
+
+var MerchantToCode = map[string]string{
+	"ID":                     "00",
+	"QRType":                 "01",
+	"MerchantInfo":           "",
+	"MerchantCode":           "",
+	"TransactionCode":        "",
+	"Amount":                 "",
+	"TipIndicator":           "",
+	"FixedTipIndicator":      "",
+	"PercentageTipIndicator": "",
+	"FixedTipVal":            "",
+	"PerentageTip":           "",
+	"CountryCode":            "",
+	"Name":                   "",
+	"City":                   "",
+	"PostalCode":             "",
+	"AdditionalData":         "",
+	"CRC":                    "",
+	"I18nMerchantInf":        "",
 }
 
 type Merchant struct {
@@ -38,8 +61,8 @@ type Merchant struct {
 	I18nMerchantInfo       string
 }
 
-//Encode string to Merchant object
-func (m *Merchant) Encode(s string) {
+//Decode string to Merchant object
+func (m *Merchant) Decode(s string) {
 	if len(s) < 5 {
 		return
 	}
@@ -123,7 +146,27 @@ func (m *Merchant) Encode(s string) {
 		m.CRC = toInt(s[2 : 2+4])
 		s = s[2+4:]
 	}
-	m.Encode(s)
+	m.Decode(s)
+
+}
+
+func (m *Merchant) Encode() string {
+	var s string
+
+	fields := reflect.TypeOf(*m)
+	values := reflect.ValueOf(*m)
+
+	num := fields.NumField()
+
+	for i := 0; i < num; i++ {
+		field := fields.Field(i)
+		value := values.Field(i)
+		fmt.Print("Type:", field.Type, ",", field.Name, "=", value, "\n")
+		// k := MerchantToCode[field.Name]
+		// v := fmt.Sprintf("%02d")
+
+	}
+	return s
 
 }
 
@@ -135,4 +178,33 @@ func toInt(s string) int {
 func toFloat(s string) float32 {
 	i, _ := strconv.ParseFloat(s, 10)
 	return float32(i)
+}
+
+func toString(i interface{}) string {
+	switch i := i.(type) {
+	case int:
+		return strconv.FormatInt(int64(i), 10)
+	case float32:
+		return strconv.FormatFloat(float64(i), 'b', -1, 32)
+	case float64:
+		log.Print(strconv.FormatFloat(i, 'f', -1, 32))
+		return strconv.FormatFloat(i, 'f', -1, 32)
+	}
+	return ""
+
+}
+
+func getValue(i interface{}) string {
+	switch i := i.(type) {
+	case string:
+		return fmt.Sprintf("%02d", len(i))
+	case int:
+		return fmt.Sprintf("%02d", len(toString(i)))
+	case float32:
+		return fmt.Sprintf("%02d", len(toString(i)))
+	case float64:
+		return fmt.Sprintf("%02d", len(toString(i)))
+	}
+	return ""
+
 }
