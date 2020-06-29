@@ -150,3 +150,49 @@ func Test_toString(t *testing.T) {
 		})
 	}
 }
+
+func TestMerchant_checksum(t *testing.T) {
+	type fields struct {
+		ID                     string
+		QRType                 string
+		IsMerchant             bool
+		IsDynamic              bool
+		MerchantInfo           string
+		MerchantCode           string
+		TransactionCode        int
+		Amount                 float32
+		TipIndicator           bool
+		FixedTipIndicator      bool
+		PercentageTipIndicator bool
+		FixedTipVal            float32
+		PerentageTip           float32
+		CountryCode            string
+		Name                   string
+		City                   string
+		PostalCode             string
+		AdditionalData         string
+		CRC                    int
+		I18nMerchantInfo       string
+	}
+
+	tests := []struct {
+		name string
+		args string
+		want string
+	}{
+		// 0002010102115138000310901020002090000000650408f8bfe0f85204000053039385802SD5916Merchant Name6008City
+		// 63045DD9
+		// polynomial: 1021
+		// initial value: FFFF
+		// value
+		{"checking md5-sum", "FFFF0002010102115138000310901020002090000000650408f8bfe0f85204000053039385802SD5916Merchant Name6008City", "5DD9"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &Merchant{}
+			if got := m.checksum(tt.args); got != tt.want {
+				t.Errorf("Merchant.checksum() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

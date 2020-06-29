@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"log"
 	"reflect"
@@ -17,6 +18,7 @@ type QR struct {
 	Value string
 }
 
+// MerchantToCode converts merchant struct tag to its equivalent EBS QR
 var MerchantToCode = map[string]string{
 	"ID":                     "00",
 	"QRType":                 "01",
@@ -38,6 +40,7 @@ var MerchantToCode = map[string]string{
 	"I18nMerchantInf":        "",
 }
 
+//Merchant qr struct
 type Merchant struct {
 	ID                     string
 	QRType                 string
@@ -93,7 +96,7 @@ func (m *Merchant) Decode(s string) {
 		s = s[8:]
 
 	case "53":
-		m.TransactionCode = toInt(s[4 : 4+3]) // i was not sure 2 + 3 equals what
+		m.TransactionCode = toInt(s[4 : 4+3]) // i was not sure 4 + 3 equals what
 		// 5303938
 		s = s[7:]
 
@@ -142,7 +145,7 @@ func (m *Merchant) Decode(s string) {
 		length := toInt(s[2:4])
 		m.AdditionalData = s[4 : 4+length]
 		s = s[4+length:]
-	case "63":
+	case "63": // FIXME this is a bug
 		m.CRC = toInt(s[2 : 2+4])
 		s = s[2+4:]
 	}
@@ -171,6 +174,31 @@ func (m *Merchant) Encode() string {
 	}
 	return s
 
+}
+
+func (m *Merchant) computeCrc() {
+	/*
+		The CRC (ID “63”) shall be calculated according to [ISO/IEC 13239] using the polynomial '1021' (hex) and
+		initial value 'FFFF' (hex). The data over which the checksum is calculated shall cover all data objects,
+		including their ID, Length and Value, to be included in the QR Code, in their respective order, as well as
+		the ID and Length of the CRC itself (but excluding its Value). Following the calculation of the checksum,
+		the resulting 2-byte hexadecimal value shall be encoded as a 4-character Alphanumeric Special value by
+		converting each nibble to an Alphanumeric Special character. For example, a CRC with a two-byte
+		hexadecimal value of '007B' is included in the QR Code as "6304007B".
+
+		Example
+
+		0002010102115138000310901020002090000000650408f8bfe0f85204000053039385802SD5912MerchantName6004City
+		CRC: 5DD9
+		6304
+
+
+	*/
+}
+
+func (m *Merchant) checksum(data string) string {
+	d := md5.Sum([]byte(data))
+	return fmt.Sprintf("%x", d)
 }
 
 func toInt(s string) int {
