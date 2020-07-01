@@ -31,10 +31,10 @@ func Test_computeCRC16(t *testing.T) {
 	type args struct {
 		data []byte
 	}
-	// v := "0002010102115138000310901020002090000000650408f8bfe0f85204000053039385802SD5916Merchant Name6008City"
+	v := "0002010102115138000310901020002090000000650408f8bfe0f85204000053039385802SD5916Merchant Name6008City6304"
 	// v2 := "00020101021226410014A000000615000101065016640209123456789520499995303458540510.005802MY5909QRCSDNBHD6005BANGI610543650"
 	v3 := "00020101021226410014A000000615000101065016640209123456789520499995303458540510.005802MY5909QRCSDNBHD6005BANGI6105436506304"
-	// data := args{data: []byte(v)}
+	data := args{data: []byte(v)}
 	// data2 := args{data: []byte(v2)}
 	data3 := args{data: []byte(v3)}
 
@@ -43,7 +43,7 @@ func Test_computeCRC16(t *testing.T) {
 		args args
 		want uint16
 	}{
-		// {"compute crc", data, 0x5DD9},
+		{"compute crc", data, 0x5DD9},
 		// {"new case", data2, 0xBFCA}, //0x6304BFCA
 		// {"from code", args{data: []byte("123456789")}, 0x906e},
 		{"new data", data3, 0xBFCA}, //0x0F96
